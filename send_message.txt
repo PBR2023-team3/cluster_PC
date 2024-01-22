@@ -1,0 +1,22 @@
+private void OnDataReceived(IAsyncResult result)
+{
+    try
+    {
+        // データを受信し、文字列に変換
+        int bytesRead = stream.EndRead(result);
+        string receivedData = System.Text.Encoding.UTF8.GetString(receiveBuffer, 0, bytesRead);
+
+        // メインスレッドでUIの変更を行う
+        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+        {
+            DisplayReceivedData(receivedData);
+        });
+
+        // 次のデータを受信するために再び非同期で待機
+        BeginReceiveData();
+    }
+    catch (Exception ex)
+    {
+        Debug.LogError($"Error receiving data: {ex.Message}");
+    }
+}
